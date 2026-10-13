@@ -16,7 +16,7 @@ const files = liste.map((f, i) => {
   fs.writeFileSync(path.join(out, "f", id + ".bin"), Buffer.concat([iv, c.update(plain), c.final(), c.getAuthTag()]));
   return { id, name: f.name, type: f.type, shell: !!f.shell };
 });
-const conf = JSON.stringify({ salt: cfg.sel, iter: cfg.iterations, files });
+const conf = JSON.stringify({ salt: cfg.sel, iter: cfg.iterations, v: Date.now().toString(36), files });
 fs.writeFileSync(path.join(out, "index.html"), fs.readFileSync("src/verrou.html", "utf8").replace("@@CFG@@", conf));
 fs.writeFileSync(path.join(out, ".nojekyll"), "");
 console.log(files.length + " fichiers chiffrés dans " + out + "/");

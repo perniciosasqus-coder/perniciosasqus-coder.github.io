@@ -54,7 +54,7 @@ async function dec(raw,buf){
   var u=new Uint8Array(buf);
   return crypto.subtle.decrypt({name:"AES-GCM",iv:u.slice(0,12)},key,u.slice(12));
 }
-async function fetchBuf(n){var r=await fetch("f/"+n+".bin",{cache:"force-cache"});if(!r.ok)throw new Error("fetch "+n);return r.arrayBuffer();}
+async function fetchBuf(n){var r=await fetch("f/"+n+".bin?v="+CFG.v,{cache:"default"});if(!r.ok)throw new Error("fetch "+n);return r.arrayBuffer();}
 async function open(raw){
   say("Déchiffrement en cours…",true);
   var all=await Promise.all(CFG.files.map(function(f){return fetchBuf(f.id);}));
