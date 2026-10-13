@@ -1,0 +1,5 @@
+content/
+dist/
+.deploy/
+.env.local
+node_modules/
