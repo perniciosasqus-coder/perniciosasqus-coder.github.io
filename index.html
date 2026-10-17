@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Compendium du discord</title>
+<style>
+:root{--bg:#f6f4ef;--fg:#1d1d1b;--mut:#5b5a55;--card:#fff;--bd:#d8d4c9;--ac:#1f4e79;--er:#a3231a}
+@media (prefers-color-scheme:dark){:root{--bg:#161614;--fg:#eceae3;--mut:#a9a79f;--card:#1f1f1c;--bd:#3a3935;--ac:#8fb8e0;--er:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px}
+main{width:100%;max-width:380px;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:28px 24px}
+h1{font-size:1.25rem;margin:0 0 .25rem}
+p{margin:.25rem 0 1rem;color:var(--mut)}
+label{display:block;font-weight:600;margin-bottom:.35rem}
+input[type=password]{width:100%;padding:.65rem .75rem;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+input:focus-visible,button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.row{display:flex;align-items:center;gap:.5rem;margin:.9rem 0;color:var(--mut);font-size:.95rem}
+button{width:100%;padding:.7rem;border:0;border-radius:8px;background:var(--ac);color:var(--bg);font:inherit;font-weight:700;cursor:pointer}
+button[disabled]{opacity:.6;cursor:wait}
+#msg{min-height:1.5em;margin:.8rem 0 0;color:var(--er);font-size:.95rem}
+#msg.ok{color:var(--mut)}
+.note{font-size:.9rem;margin:1rem 0 0}
+details{margin-top:1rem;border-top:1px solid var(--bd);padding-top:.7rem;color:var(--mut);font-size:.9rem}
+summary{cursor:pointer;font-weight:600}
+#hl{list-style:none;margin:.5rem 0 0;padding:0}#hl li{display:flex;justify-content:space-between;gap:.5rem;padding:.15rem 0}
+#hl .ko{color:var(--er)}
+#hc{width:auto;margin-top:.6rem;padding:.35rem .7rem;background:transparent;color:var(--mut);border:1px solid var(--bd);font-weight:400;font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Compendium du discord</h1>
+<p>Accès protégé. Saisissez le mot de passe.</p>
+<form id="f" autocomplete="off">
+<label for="pw">Mot de passe</label>
+<input id="pw" type="password" autocomplete="current-password" required autofocus>
+<div class="row"><input id="rm" type="checkbox"><label for="rm" style="margin:0;font-weight:400">Mémoriser sur cet appareil</label></div>
+<button id="go" type="submit">Ouvrir</button>
+<p id="msg" role="status" aria-live="polite"></p>
+</form>
+<p class="note">Le mot de passe change hebdomadairement, si vous n’avez plus accès, contactez le propriétaire du site.</p>
+<details id="hd"><summary>Historique de connexion sur cet appareil</summary>
+<ul id="hl"></ul><p id="he" style="margin:.5rem 0 0">Aucune connexion enregistrée.</p>
+<button type="button" id="hc">Effacer l’historique</button></details>
+</main>
+<script>
+(function(){
+"use strict";
+var CFG={"salt":"VGefG9Wn+5JEYleqOf/tlQ==","iter":600000,"v":"mvcqryf6","files":[{"id":"00","name":"index.html","type":"text/html","shell":true},{"id":"01","name":"style.css","type":"text/css","shell":false},{"id":"02","name":"data/00-aides.js","type":"text/javascript","shell":false},{"id":"03","name":"data/cours-01.js","type":"text/javascript","shell":false},{"id":"04","name":"data/cours-02.js","type":"text/javascript","shell":false},{"id":"05","name":"data/cours-03.js","type":"text/javascript","shell":false},{"id":"06","name":"data/cours-04.js","type":"text/javascript","shell":false},{"id":"07","name":"data/cours-05.js","type":"text/javascript","shell":false},{"id":"08","name":"data/cours-06.js","type":"text/javascript","shell":false},{"id":"09","name":"data/cours-07.js","type":"text/javascript","shell":false},{"id":"10","name":"app.js","type":"text/javascript","shell":false}]};
+var LS="cmp-key-v1", LG="cmp-log-v1";
+var $=function(i){return document.getElementById(i);};
+function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+function b64e(u){var s="";for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s);}
+function logGet(){try{var a=JSON.parse(localStorage.getItem(LG));return Array.isArray(a)?a:[];}catch(e){return [];}}
+function logAdd(k){try{var a=logGet();a.push({t:Date.now(),k:k});localStorage.setItem(LG,JSON.stringify(a.slice(-30)));}catch(e){}}
+var LBL={ok:"Connexion réussie",auto:"Connexion automatique (mémorisée)",ko:"Mot de passe incorrect"};
+function logShow(){
+  var a=logGet().slice(-10).reverse(),ul=$("hl");ul.innerHTML="";
+  a.forEach(function(x){var li=document.createElement("li"),d=new Date(x.t);
+    var l=document.createElement("span");l.textContent=LBL[x.k]||x.k;if(x.k==="ko")li.className="ko";
+    var r=document.createElement("span");r.textContent=d.toLocaleDateString("fr-FR")+" "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+    li.appendChild(l);li.appendChild(r);ul.appendChild(li);});
+  $("he").hidden=a.length>0;
+}
+function say(t,ok){var m=$("msg");m.textContent=t;m.className=ok?"ok":"";}
+async function deriveRaw(pw){
+  var km=await crypto.subtle.importKey("raw",new TextEncoder().encode(pw),"PBKDF2",false,["deriveBits"]);
+  var bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:b64(CFG.salt),iterations:CFG.iter,hash:"SHA-256"},km,256);
+  return new Uint8Array(bits);
+}
+async function dec(raw,buf){
+  var key=await crypto.subtle.importKey("raw",raw,"AES-GCM",false,["decrypt"]);
+  var u=new Uint8Array(buf);
+  return crypto.subtle.decrypt({name:"AES-GCM",iv:u.slice(0,12)},key,u.slice(12));
+}
+async function fetchBuf(n){var r=await fetch("f/"+n+".bin?v="+CFG.v,{cache:"default"});if(!r.ok)throw new Error("fetch "+n);return r.arrayBuffer();}
+async function open(raw){
+  say("Déchiffrement en cours…",true);
+  var all=await Promise.all(CFG.files.map(function(f){return fetchBuf(f.id);}));
+  var out={};
+  for(var i=0;i<CFG.files.length;i++){
+    var f=CFG.files[i],plain=await dec(raw,all[i]);
+    out[f.name]=URL.createObjectURL(new Blob([plain],{type:f.type}));
+    if(f.shell) out.__shell=new TextDecoder().decode(plain);
+  }
+  var html=out.__shell;
+  html=html.replace(/(href|src)="([^"#:]+)"/g,function(m,a,p){return out[p]?a+'="'+out[p]+'"':m;});
+  document.open();document.write(html);document.close();
+}
+async function tryRaw(raw){
+  try{await open(raw);return true;}catch(e){return false;}
+}
+$("hc").addEventListener("click",function(){try{localStorage.removeItem(LG);}catch(e){}logShow();});
+logShow();
+$("f").addEventListener("submit",async function(ev){
+  ev.preventDefault();
+  var b=$("go");b.disabled=true;say("Vérification…",true);
+  try{
+    var raw=await deriveRaw($("pw").value);
+    var first=await fetchBuf(CFG.files[0].id);
+    try{await dec(raw,first);}catch(e){logAdd("ko");logShow();say("Mot de passe incorrect.");b.disabled=false;return;}
+    if($("rm").checked){try{localStorage.setItem(LS,b64e(raw));}catch(e){}}
+    logAdd("ok");
+    await open(raw);
+  }catch(e){say("Erreur de chargement : "+e.message);b.disabled=false;}
+});
+(async function(){
+  var k=null;try{k=localStorage.getItem(LS);}catch(e){}
+  if(!k) return;
+  var raw=b64(k),b=$("go");b.disabled=true;say("Ouverture…",true);
+  try{var first=await fetchBuf(CFG.files[0].id);await dec(raw,first);}catch(e){try{localStorage.removeItem(LS);}catch(x){}say("");b.disabled=false;return;}
+  logAdd("auto");
+  await tryRaw(raw)||(say("Erreur de chargement."),b.disabled=false);
+})();
+})();
+</script>
+</body>
+</html>
