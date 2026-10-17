@@ -1,7 +1,7 @@
 // Réglages publics du site. Le mot de passe n'est jamais stocké ici.
 export default {
   titre: "Compendium du discord",
-  sel: "fabv8WtKCYgeZ3580XY11w==",          // sel PBKDF2 (public)
+  sel: "VGefG9Wn+5JEYleqOf/tlQ==",          // sel PBKDF2 (public)
   iterations: 600000,     // coût de dérivation de la clé
   contenu: "content/site", // site en clair (ignoré par Git)
   sortie: "dist"           // site chiffré, publié sur gh-pages
